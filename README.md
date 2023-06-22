@@ -22,6 +22,25 @@ Tests - [InMemorySingleNodeRateLimiterTest.java](https://github.com/dsotnyk/Embe
 
 Compile with Maven on your own. **And sorry for the long tests, they verify Race Conditions.**
 
+> **mvn package**  
+...   
+==================== EXECUTION 49 COMPLETE at 1687409947479. 60 threads out of 2000 was delayed or slow. Performance is 4011000 TPS  
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1,315.523 s - in me.sotnyk.ratelimiter.InMemorySingleNodeRateLimiterTest  
+[INFO]  
+[INFO] Results:  
+[INFO]  
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0  
+[INFO]  
+[INFO]  
+[INFO] --- maven-jar-plugin:3.0.2:jar (default-jar) @ ratelimiter ---  
+[INFO] **Building jar: /home/sdv/code/GitHub/dsotnyk/EmbeddedRateLimiter/target/ratelimiter-1.0-SNAPSHOT.jar**   
+[INFO] ------------------------------------------------------------------------  
+[INFO] BUILD SUCCESS  
+[INFO] ------------------------------------------------------------------------  
+[INFO] **Total time:  21:58 min**  
+[INFO] Finished at: 2023-06-21T21:59:08-07:00  
+[INFO] ------------------------------------------------------------------------  
+
 # What's here
 
 - Simple MT implementation
