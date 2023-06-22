@@ -9,6 +9,9 @@ import java.util.concurrent.*;
 
 public class InMemorySingleNodeRateLimiterTest {
 
+    /**
+     * Simple single-thread run for LIMIT requests and then for another LIMIT requests with the same session ID
+     */
     @Test
     public void testHappyPathSequentialSamePeriod() throws InterruptedException {
         // init
@@ -18,15 +21,20 @@ public class InMemorySingleNodeRateLimiterTest {
 
         InMemorySingleNodeRateLimiter.initialize(pp);
 
+        // Run till limit
         for (int i = 0; i < pp.getLimit(); i++) {
             Assert.assertTrue(InMemorySingleNodeRateLimiter.getInstance().isAllowed("suryfcv384t"));
         }
 
+        // Run over limit
         for (int i = 0; i < pp.getLimit(); i++) {
             Assert.assertFalse(InMemorySingleNodeRateLimiter.getInstance().isAllowed("suryfcv384t"));
         }
     }
 
+    /**
+     * Test bucket expiration
+     */
     @Test
     public void testBucketRotateSequentialSinglePeriod() throws InterruptedException {
         // init
@@ -36,25 +44,28 @@ public class InMemorySingleNodeRateLimiterTest {
 
         InMemorySingleNodeRateLimiter.initialize(pp);
 
+        // Run to limit
         for (int i = 0; i < pp.getLimit(); i++) {
             Assert.assertTrue(InMemorySingleNodeRateLimiter.getInstance().isAllowed("suryfcv384t"));
         }
 
+        // Run over limit
         for (int i = 0; i < pp.getLimit(); i++) {
             Assert.assertFalse(InMemorySingleNodeRateLimiter.getInstance().isAllowed("suryfcv384t"));
         }
 
-        // cleanup
+        // wait for expiration
         Thread.sleep(pp.getPeriod() * 1000L);
 
-        // try again
+        // try again, run to limit
         for (int i = 0; i < pp.getLimit(); i++) {
             Assert.assertTrue(InMemorySingleNodeRateLimiter.getInstance().isAllowed("suryfcv384t"));
         }
     }
 
     /**
-     * Run multiple different sessions in parallel. Each session is sequential
+     * Run multiple different sessions in parallel. Each session is sequential, but runs in separate thread.
+     * SINGLE Run
      */
     @Test
     public void testHappyPathParallelSinglePeriod() throws InterruptedException, ExecutionException {
@@ -88,7 +99,8 @@ public class InMemorySingleNodeRateLimiterTest {
     }
 
     /**
-     * Run multiple different sessions in parallel for stability. Each session is sequential
+     * Run multiple different sessions in parallel for stability. Each session is sequential, but runs in separate thread.
+     * MULTIPLE RUNS
      */
     @Test
     public void testSimpleStability() throws InterruptedException, ExecutionException {
@@ -115,6 +127,7 @@ public class InMemorySingleNodeRateLimiterTest {
             tasks.add(new SimpleTestRunner(InMemorySingleNodeRateLimiter.getInstance(), Integer.toString(i), pp.getLimit() * MULTIPLIER));
         }
 
+        // calculate all periods and verify
         for (int r = 0; r < PERIODS; r++) {
             // wait till period starts
             Thread.sleep(pp.getPeriod() * 1000L - System.currentTimeMillis() % (pp.getPeriod() * 1000L));
@@ -152,7 +165,8 @@ public class InMemorySingleNodeRateLimiterTest {
     }
 
     /**
-     * Run multiple different sessions in parallel for stability. True emulation
+     * Run multiple different sessions in parallel for stability. TRUE emulation, each session is run in parallel
+     * This is the most comprehensive test which will reveal all possible race conditions. It's LONG (20 mins on i9-9900K)
      */
     @Test
     public void testComprehensive() throws InterruptedException, ExecutionException {
@@ -186,12 +200,14 @@ public class InMemorySingleNodeRateLimiterTest {
             }
         }
 
+        // run X times
         for (int r = 0; r < PERIODS; r++) {
             // wait till period starts
             Thread.sleep(pp.getPeriod() * 1000L - System.currentTimeMillis() % (pp.getPeriod() * 1000L));
 
             d.twit("==================== Run " + r + " started at " + System.currentTimeMillis() + " on timeblock " + System.currentTimeMillis() / (pp.getPeriod() * 1000L));
 
+            // run it!!!
             var results = executorService.invokeAll(tasks);
 
             long maxTime = System.currentTimeMillis();
@@ -199,8 +215,10 @@ public class InMemorySingleNodeRateLimiterTest {
             int fastThreads = 0;
             int slowThreads = 0;
 
+            // merge all threads per sessionId
             var stats = extractStats(results);
 
+            // verify
             for (var stat : stats) {
 
                 if (stat.blocks == 1) {
