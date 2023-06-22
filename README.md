@@ -15,7 +15,7 @@ On my i9-9900K
 
 # Where to start reading
 
-Code - [InMemorySingleNodeRateLimiter.java](https://github.com/dsotnyk/EmbeddedRateLimiter/blob/main/src/main/java/me/sotnyk/ratelimiter/InMemorySingleNodeRateLimiter.java)
+Code - [InMemorySingleNodeRateLimiter.java](https://github.com/dsotnyk/EmbeddedRateLimiter/blob/main/src/main/java/me/sotnyk/ratelimiter/InMemorySingleNodeRateLimiter.java)  
 Tests - [InMemorySingleNodeRateLimiterTest.java](https://github.com/dsotnyk/EmbeddedRateLimiter/blob/main/src/test/java/me/sotnyk/ratelimiter/InMemorySingleNodeRateLimiterTest.java)
 
 # Where to get
