@@ -5,7 +5,9 @@
 API have next methods
 - isAllowed(sessionID)
 
-RateLimiter is built to guarantee that particular session will be allowed exactly specified amount of requests per specified period, no matter the threads count.    
+RateLimiter is built to guarantee that particular session will be allowed exactly specified amount of requests per specified period, no matter the threads count. 
+
+Algo is based on fixed window approach, which have pros and cons, in general, it is calculated for the current physical second. So, if you have limit in 100rps, this limiter will allow you 100 requests at 999ms timemark and another 100 requests at 1000ms timemark. Nevertheless, it is fast as hell.
 
 On my i9-9900K
 - with 2000 threads I got about **4.44M TPS**
